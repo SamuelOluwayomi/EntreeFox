@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -96,3 +96,24 @@ class FollowToggleView(APIView):
         else:
             Follow.objects.create(follower=request.user, following=target_user)
             return Response({"message": f"You are now following @{target_user.username}"})
+
+ # to view who a user is following 
+class FollowingListView(ListAPIView):
+    serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = get_object_or_404(User, id=user_id)
+        return User.objects.filter(followers__follower=user)
+
+
+# to view a user's followers
+class FollowersListView(ListAPIView):
+    serializer_class = UserListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        user = get_object_or_404(User, id=user_id)
+        return User.objects.filter(following__following=user)

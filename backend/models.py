@@ -54,7 +54,7 @@ class Follow(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('follower', 'following')  # prevents duplicate follows
+        unique_together = ('follower', 'following')  # to prevent duplicate follows
 
     def __str__(self):
         return f"{self.follower.username} -> {self.following.username}"
