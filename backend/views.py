@@ -6,10 +6,10 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .serializers import UserSerializer, UserListSerializer, UserProfileSerializer
-from rest_framework.permissions import IsAdminUser
-from rest_framework.generics import ListAPIView
-from .models import User, Follow
+from .serializers import UserSerializer, UserListSerializer, UserProfileSerializer, PostSerializer
+from rest_framework.permissions import IsAdminUser, IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.generics import ListAPIView, ListCreateAPIView
+from .models import User, Follow, Post
 
 class TestAuthView(APIView):
     permission_classes = [IsAuthenticated]
@@ -117,3 +117,20 @@ class FollowersListView(ListAPIView):
         user_id = self.kwargs['user_id']
         user = get_object_or_404(User, id=user_id)
         return User.objects.filter(following__following=user)
+    
+class PostListCreateView(ListCreateAPIView):
+    queryset = Post.objects.all().order_by('-created_at')
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+class FeedView(ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # to get users that the current user is following
+        following_users = self.request.user.following.values_list('following_id', flat=True)
+        return Post.objects.filter(author__id__in=following_users).order_by('-created_at')

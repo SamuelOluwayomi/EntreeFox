@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import Post, User
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -35,3 +35,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def get_following_count(self, user):
         return user.following.count()
+    
+class PostSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = Post
+        fields = [
+            'id', 'author', 'content', 'image', 'video', 'location', 'emojis', 'created_at'
+        ]
+        read_only_fields = ['id', 'author', 'created_at']

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import TestAuthView, RegisterView, AllUsersView, ProfileView, FollowToggleView
+from .views import FeedView, PostListCreateView, TestAuthView, RegisterView, AllUsersView, ProfileView, FollowToggleView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -14,4 +14,6 @@ urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('follow/<int:user_id>/', FollowToggleView.as_view(), name='follow-toggle'),
+    path('posts/', PostListCreateView.as_view(), name='posts'),
+    path('feed/', FeedView.as_view(), name='feed'),  
 ]
