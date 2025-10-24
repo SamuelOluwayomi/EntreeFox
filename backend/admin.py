@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Follow, User
+from .models import Follow, User, Post
 
 # Register your models here.
 @admin.register(User)
@@ -29,3 +29,9 @@ class UserAdmin(admin.ModelAdmin):
 class FollowAdmin(admin.ModelAdmin):
     list_display = ('id', 'follower', 'following', 'created_at')
     search_fields = ('follower__username', 'following__username')
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('id', 'author', 'content', 'image', 'video', 'location', 'emojis', 'created_at')
+    search_fields = ('author__username', 'content')
+    list_filter = ('created_at',)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, User
+from .models import Post, User, Comment
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -38,10 +38,30 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
 class PostSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
+    likes_count = serializers.SerializerMethodField()
+    user_has_liked = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
         fields = [
-            'id', 'author', 'content', 'image', 'video', 'location', 'emojis', 'created_at'
+            'id', 'author', 'content', 'image', 'video', 'location', 'emojis', 'created_at',
+            'likes_count', 'user_has_liked'
         ]
+        read_only_fields = ['id', 'author', 'created_at']
+
+    def get_likes_count(self, post):
+        return post.likes.count()
+
+    def get_user_has_liked(self, post):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return post.likes.filter(user=request.user).exists()
+        return False
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'author', 'content', 'created_at']
         read_only_fields = ['id', 'author', 'created_at']
