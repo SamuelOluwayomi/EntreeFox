@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Follow, User, Post
+from .models import Comment, Follow, User, Post
 
 # Register your models here.
 @admin.register(User)
@@ -34,4 +34,10 @@ class FollowAdmin(admin.ModelAdmin):
 class PostAdmin(admin.ModelAdmin):
     list_display = ('id', 'author', 'content', 'image', 'video', 'location', 'emojis', 'created_at')
     search_fields = ('author__username', 'content')
+    list_filter = ('created_at',)
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'post', 'author', 'content', 'created_at')
+    search_fields = ('author__username', 'post__id', 'content')
     list_filter = ('created_at',)
